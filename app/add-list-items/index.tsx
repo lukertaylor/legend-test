@@ -23,31 +23,21 @@ type renderItemProps = {
 
 const AddListItemsScreen = observer(() => {
   const { listId } = useLocalSearchParams<ParamsType>();
-  const listItems = store$.lists
-    .find((list) => list.get().id === listId)!
-    .listItems.get();
+  const list$ = store$.lists.find((list) => list.get().id === listId)!;
+  const listItems = list$.listItems.get();
 
   function addListItems() {
     const item1 = new Item({ title: 'Greek yogurt' });
     const newListItem1 = new ListItem({ item: item1, quantity: 2 });
     const item2 = new Item({ title: 'Baked beans' });
     const newListItem2 = new ListItem({ item: item2 });
-    store$.lists
-      .find((list) => list.get().id === listId)!
-      .listItems.set((prevListItems) => [
-        ...prevListItems,
-        newListItem1,
-        newListItem2
-      ]);
+
+    list$.listItems.push(newListItem1, newListItem2);
   }
 
   function deleteListItem(listItemId: string) {
-    const updatedListItems = listItems.filter(
-      (listItem) => listItem.id != listItemId
-    );
-    store$.lists
-      .find((list) => list.get().id === listId)!
-      .listItems.set(updatedListItems);
+    const idx = listItems.findIndex((listItem) => listItem.id === listItemId);
+    list$.listItems.splice(idx, 1);
   }
 
   function renderItem({ item }: renderItemProps) {
